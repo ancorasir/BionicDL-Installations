@@ -39,7 +39,7 @@ make -C nvdsinfer_custom_impl_Yolo
 
 ### Create configuration
  1. Create deepstream_app_config_yoloV3-D435.txt
-    - Realsense D435 streams 3 videos under /dev/video0/1/2. video2 is the RGB coloe iamge stream. You can use `v4l2-ctl --list-formats-ext --device video2` to list information of the stream. Set `camera-v4l2-dev-node=1` under [source0]
+    - Realsense D435 streams 3 videos under /dev/video0/1/2. video2 is the RGB coloe iamge stream. You can use `v4l2-ctl --list-formats-ext --device video2` to list information of the stream. Set `camera-v4l2-dev-node=2` under [source0]. You can run `cheese` to see the video stream. For the access of depth map, please refer to the [dicussion](https://forums.developer.nvidia.com/t/how-to-use-deepstream4-0-2-with-realsense/123245).
     - If deployed on TX2, you have to inference every few frame in order to have realtime detection. By default, DeepStream runs inference every frame. If you run inference at 30 fps, the GPU has to do 30 inference operations per second. Depending on the size of the model and the size of the GPU, this might exceed the computing capacity. For example, the process rate of TX2 for yoloV3 is 5 fps, you need to set `interval=6` under [primary-gie] to have good realtime detection.
     - Use a high-quality tracker to predict the bounding box of the object based on previous locations. The tracker is generally less compute-intensive than doing a full inference. With a tracker, you can process more streams or even do a higher resolution inference.
     ```
@@ -162,7 +162,7 @@ make -C nvdsinfer_custom_impl_Yolo
 
 ### Run the application
 ```bash
-deepstream-app -c deepstream_app_config_yoloV3-camera.txt
+deepstream-app -c deepstream_app_config_yoloV3-D435.txt
 ```
 
 You should see a video window. And in the terminal you should see the performance 
