@@ -1,0 +1,49 @@
+////////////////////////////////////////////////////////////////////////////
+Install dexnet custom-databases according to Dex-Net Installation Instructions.docx
+
+Issues:
+
+git clone https://github.com/jeffmahler/v-hacd.git
+cd v-hacd
+sudo sh install.sh
+
+安装ＦＣＬ相关：
+sudo apt-get install liboctomap-dev
+install fcl from source https://github.com/flexible-collision-library/fcl/blob/master/INSTALL
+sudo pip install python-fcl
+
+
+Install Openrave (optional)
+git clone https://github.com/jeffmahler/openrave
+openrave.py --example graspplanning
+2018-05-25 15:21:51,210 openrave [WARN] [plugindatabase.h:577 InterfaceBasePtr OpenRAVE::RaveDatabase::Create] Failed to create name fcl_, interface collisionchecker
+
+(dexnet_cli.py:19695): Gdk-WARNING **: /build/gtk+2.0-jJZIsQ/gtk+2.0-2.24.30/gdk/x11/gdkdrawable-x11.c:952 drawable is not a pixmap or window
+this is an issue with wxpython 2.6.3.2 and VTK's wxVTKRenderWindowInteractor
+
+install meshrender from source under catkin_ws_dexnet
+
+meshpy from autolab is dependent on trimesh
+trimesh is dependent on meshpy.triangle, which is not include in meshpy installed from autolab
+import meshpy.triangle as triangle
+import meshpy.mesh as mesh
+解决方法：
+
+sudo pip install MeshPy, /usr/local/lib/python2.7/dis-
+sudo pip install trimesh-2.30.8
+move /MeshPy-2018.1.dist-info and /meshpy to /python2.7/dis-packages/trimesh/
+move /meshpy/triangle.py to ../
+change creation.py "import meshpy.triangle as triangle" to "import triangle as triangle"
+install autolab meshpy from source code under /home/
+
+trimesh version problem?
+python setup.py install from source code autolab
+unzip .egg file into trimesh and trimesh-2.29.12.egg-info
+move /MeshPy-2018.1.dist-info and /meshpy to /python2.7/dis-packages/trimesh/
+move /meshpy/triangle.py to ../
+
+remember to source devel/setup.bash
+
+No module named ruamel.yaml
+Solution: sudo pip install ruamel.yaml, add __init__.py under /lib/python2.7/dist-packages/ruamel/
+

@@ -1,0 +1,153 @@
+use pip 9.0
+///////////////////////////////////////////
+Install gqcnn 2.0 WITHOUT ROS
+
+1. Install autolab_core
+cd {PATH_TO_YOUR_CATKIN_WORKSPACE}/src
+git clone https://github.com/BerkeleyAutomation/autolab_core.git
+cd autolab_core
+python setup.py install
+
+2. Install perception:
+cd {PATH_TO_YOUR_CATKIN_WORKSPACE}/src
+git clone https://github.com/BerkeleyAutomation/perception.git
+cd perception
+pip install -e . #This will install the package under current folder and add the path to sys.path. 
+
+3. Install visualization
+git clone https://github.com/BerkeleyAutomation/visualization.git #Depednent in meshrender, trimesh, imageio, perception
+sudo python setup.py develop 
+#This command will create symlinks to the source directory within site-packages instead of copying things. Because of this, it is quite fast (particularly for large packages).
+
+4. Install tensorflow: with cuda8,install <1.5.0, tensorflow1.8.0 requires cuda 9, change to cpu if you don't have cuda
+sudo pip install tensorflow_gpu==1.2.1 -i http://pypi.mirrors.ustc.edu.cn/simple --trusted-host pypi.mirrors.ustc.edu.cn
+sudo pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ https://mirrors.tuna.tsinghua.edu.cn/tensorflow/linux/gpu/tensorflow_gpu-1.4.0-cp27-none-linux_x86_64.whl
+
+5. Install gqcnn
+cd {PATH_TO_YOUR_CATKIN_WORKSPACE}/src
+copy gqcnn from http://192.168.10.7/cobotsys/algorithm/tree/master/algorithm/grasp_planning/catkin_ws_ROS-gqcnn2/gqcnn
+cd gqcnn
+python setup.py install
+
+///////////////////////////////////
+Install gqcnn 2.0/3.0 and autolab_core as ROS package, remove installed packages (autolab_core, gqcnn) in /usr/local/lib/python2.7/dist-packages/ if previously installed and (clean catkin_ws work space if needed)
+
+cd {PATH_TO_YOUR_CATKIN_WORKSPACE}/src
+
+git clone https://github.com/BerkeleyAutomation/autolab_core.git
+if install 3.0: git checkout learning-tools
+
+git clone https://github.com/BerkeleyAutomation/perception.git
+
+git clone https://github.com/BerkeleyAutomation/visualization.git
+
+if 2.0
+  copy gqcnn from http://192.168.10.7/cobotsys/algorithm/tree/master/algorithm/grasp_planning/catkin_ws_ROS-gqcnn2/gqcnn
+if 3.0
+  copy gqcnn from http://192.168.10.7/cobotsys/algorithm/tree/master/algorithm/grasp_planning/catkin_ws_ROS-gqcnn3-dexnet/gqcnn
+
+catkin build
+
+change .bashrc file:
+change the catkin workspace dir
+PYTHONPATH add '/home/wanfang/catkin_ws_dexnet/devel/lib/python2.7/dist-packages' to PYTHONPATH
+
+Test: python policy_3.py under src/gqcnn/ 
+
+如果是gqcnn新的代码（吸盘）需要修改，在gqcnn/__init__.py文件中添加from visualizer import Visualizer,添加'Visualizer'到__all__
+
+fix Boost.NumPy:LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/usr/local/lib64, Open the /etc/ld.so.conf as sudo and add a new line with the library directory.
+
+autolab_perception不是ｒｏｓ安装的问题，缺少cv-bridge：sudo apt-get install python-cv-bridge
+
+///////////////////////////////////////////////////////////
+抓取仿真 with gqcnn 2.0
+* Install FCL and octomap
+Issue: The master branch is 0.6 but ros kinetic requires fcl 0.5
+sudo apt-get -qq remove libfcl0 libfcl-dev ros-kinetic-octomap
+Removing ros-kinetic-trac-ik-kinematics-plugin (1.4.11-0xenial-20180223-011837-0800) ...
+Removing ros-kinetic-moveit-core (0.9.11-0xenial-20180223-010000-0800) ...
+Removing libfcl-0.5-dev (0.5.0-3osrf1~xenial3) ...
+Removing ros-kinetic-robot (1.3.1-0xenial-20180105-191201-0800) ...
+Removing ros-kinetic-robot-model (1.12.11-0xenial-20180105-190034-0800) ...
+Removing ros-kinetic-collada-urdf (1.12.10-0xenial-20180105-165828-0800) ...
+Removing ros-kinetic-geometric-shapes (0.5.3-1xenial-20171130-112938-0800) ...
+Removing ros-kinetic-octomap (1.8.1-0xenial-20171104-172906-0800) ...
+
+remove octomap installed by the system under /usr/lib/
+sudo apt-get install ros-kinetic-octomap #under /opt/ros/kinetic/lib
+install fcl 0.5 from source
+
+* Install ros moveit:
+sudo apt-get install ros-kinetic-moveit
+The following NEW packages will be installed:
+  libfcl-0.5-dev ros-kinetic-cv-bridge ros-kinetic-geometric-shapes ros-kinetic-moveit
+  ros-kinetic-moveit-commander ros-kinetic-moveit-core ros-kinetic-moveit-fake-controller-manager
+  ros-kinetic-moveit-kinematics ros-kinetic-moveit-planners ros-kinetic-moveit-planners-ompl
+  ros-kinetic-moveit-plugins ros-kinetic-moveit-ros ros-kinetic-moveit-ros-benchmarks
+  ros-kinetic-moveit-ros-control-interface ros-kinetic-moveit-ros-manipulation
+  ros-kinetic-moveit-ros-move-group ros-kinetic-moveit-ros-perception
+  ros-kinetic-moveit-ros-planning ros-kinetic-moveit-ros-planning-interface
+  ros-kinetic-moveit-ros-robot-interaction ros-kinetic-moveit-ros-visualization
+  ros-kinetic-moveit-ros-warehouse ros-kinetic-moveit-setup-assistant
+  ros-kinetic-moveit-simple-controller-manager ros-kinetic-ompl ros-kinetic-opencv3
+
+* Install PCL
+
+remove old pcl version 1.7.2
+sudo apt-get remove libpcl*
+The following packages will be REMOVED:
+  libpcl-apps1.7 libpcl-common1.7 libpcl-conversions-dev libpcl-dev libpcl-doc libpcl-features1.7 libpcl-filters1.7 libpcl-io1.7 libpcl-kdtree1.7 libpcl-keypoints1.7 libpcl-msgs-dev
+  libpcl-octree1.7 libpcl-outofcore1.7 libpcl-people1.7 libpcl-recognition1.7 libpcl-registration1.7 libpcl-sample-consensus1.7 libpcl-search1.7 libpcl-segmentation1.7
+  libpcl-surface1.7 libpcl-tracking1.7 libpcl-visualization1.7 libpcl1 libpcl1-dev libpcl1.7 libpcl1.7-dbg ros-kinetic-desktop-full ros-kinetic-pcl-conversions ros-kinetic-pcl-ros
+  ros-kinetic-perception ros-kinetic-perception-pcl
+
+
+*Install ros pcl for 1.8.1 from source, apt-get will install ros pcl for 1.7.1
+PCL from master, where the ConditionalRemoval constructor has been removed (where it was previously just marked deprecated). Fixed by cloning PCL from the 1.8.1 tag.
+wget https://github.com/PointCloudLibrary/pcl/archive/pcl-1.8.1.tar.gz
+tar -xf pcl-1.8.1.tar.gz
+cd pcl-pcl-1.8.1 && mkdir build && cd build
+cmake ..
+make
+sudo make install
+sudo pip install cython==0.25.2
+git clone https://github.com/strawlab/python-pcl.git
+cd python-pcl
+python setup.py build
+sudo python setup.py install
+
+
+cd {PATH_TO_YOUR_CATKIN_WORKSPACE}/src
+sudo apt-get remove ros-kinetic-pcl-msgs ros-kinetic-pcl-conversions ros-kinetic-pcl-ros
+git clone https://github.com/ros-perception/perception_pcl.git
+git clone https://github.com/ros-perception/pcl_msgs.git
+catkin clean
+catkin build
+
+* Install grasping project
+git clone https://github.com/udacity/RoboND-Perception-Project.git #code is updated since mine time
+rosdep install --from-paths src --ignore-src --rosdistro=kinetic -y
+
+* Install gqcnn 2.0/3.0 as ros package mentioned above 
+
+catkin build
+source /opt/ros/kinetic/setup.bash
+add the following to .bashrc:
+export GAZEBO_MODEL_PATH=~/catkin_ws/src/RoboND-Perception-Project/pr2_robot/models:$GAZEBO_MODEL_PATH
+source ~/catkin_ws/devel/setup.bash
+
+new terminal: roslaunch pr2_robot pick_place_project.launch
+new terminal: roslaunch gqcnn gqcnn.launch
+new terminal: rosrun pr2_robot project_grasp.py
+
+Issue: https://github.com/udacity/RoboND-Perception-Exercises/issues/18
+remove build info under /python-pcl
+reinstall....
+
+////////////////////////////////////////////////////////
+Install GQCNN on server: ssh -X user@192.168.10.15    密码cobotvision
+training: ~/anaconda2/bin/python training.py
+logout from the server: logout
+
+
