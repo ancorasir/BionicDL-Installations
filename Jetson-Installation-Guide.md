@@ -54,6 +54,7 @@ cd $LIBREALSENSE_DIRECTORY
 sudo cp config/99-realsense-libusb.rules /etc/udev/rules.d/
 sudo udevadm control --reload-rules && udevadm trigger
 ```
+**Issue**: With SDK 2.35.2, there is a bug with cuda on. Solution: navigate to src/proc/pointcloud.h in the source tree and add `#include "synthetic-stream.h"` next to `#include "../include/librealsense2/hpp/rs_frame.hpp"`
 
 Test if you have successfully installed the realsense library
 ```bash
